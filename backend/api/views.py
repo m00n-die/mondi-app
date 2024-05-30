@@ -15,7 +15,7 @@ class FileListCreate(generics.ListCreateAPIView):
     """View for adding files and listing existing files"""
 
     serializer_class = FileSerializer
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self) -> BaseManager[File]:
         user = self.request.user
@@ -31,7 +31,7 @@ class FileListCreate(generics.ListCreateAPIView):
 class FileUploadView(APIView):
     """View for upload of files to server. Only allows authenticated users"""
 
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
     parser_classes = [MultiPartParser, FormParser]
 
     def post(self, request):
@@ -65,7 +65,7 @@ class FileDelete(generics.DestroyAPIView):
 class ShareFileView(APIView):
     permission_classes = [IsAuthenticated]
 
-    def post(self, request, file_id):
+    def post(self, request, file_id) -> Response:
         try:
             file_to_share = File.objects.get(pk=file_id)
             if file_to_share.user != request.user:

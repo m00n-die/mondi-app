@@ -7,6 +7,7 @@ import Home from "./pages/Home"
 import NotFound from "./pages/NotFound"
 import UploadPage from "./pages/UploadPage"
 import ProtectedRoute from "./components/ProtectedRoute"
+import ShareFile from "./components/FileShare"
 
 function Logout() {
   localStorage.clear()
@@ -34,6 +35,7 @@ function App() {
         <Route path="/logout" element={<Logout />} />
         <Route path="/register" element={<RegisterAndLogout />} />
         <Route path="/upload" element={<UploadPage />} />
+        <Route path="share-file" element={<ShareFile />} />
         <Route path="*" element={<NotFound />}></Route>
       </Routes>
     </BrowserRouter>
