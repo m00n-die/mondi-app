@@ -13,7 +13,7 @@ function GetSharedFiles() {
       setError(null);
       try {
         const response = await api.get('/api/files/shared/');
-        setSharedFiles(response.data);
+        setSharedFiles(response.data.map((file) => ({ ...file, downloadUrl: null })));
       } catch (error) {
         console.error('Error fetching shared files:', error);
         setError('Error fetching shared files. Please try again.');
