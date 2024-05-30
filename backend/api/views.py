@@ -97,7 +97,9 @@ class ShareFileView2(APIView):
         try:
             recipient = CustomUser.objects.get(username=username)
             file = File.objects.get(pk=pk, user=user)
-            shared_file = SharedFile.objects.create(file=file, recipient=recipient)
+            shared_file = SharedFile.objects.create(
+                file=file, recipient=recipient, filename=file.filename
+            )
             serializer = SharedFileSerializer(shared_file)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         except CustomUser.DoesNotExist:

@@ -9,6 +9,7 @@ import UploadPage from "./pages/UploadPage"
 import ProtectedRoute from "./components/ProtectedRoute"
 import ShareFile from "./components/ShareFile"
 import UserFilesList from "./components/UserFilesList"
+import GetSharedFiles from './components/GetSharedFiles';
 
 function Logout() {
   localStorage.clear()
@@ -37,6 +38,7 @@ function App() {
         <Route path="/files" element={<UserFilesList />} />
         <Route path="/register" element={<RegisterAndLogout />} />
         <Route path="/upload" element={<UploadPage />} />
+        <Route path="/shared-files" element={<GetSharedFiles />} />
         <Route path="share-file" element={<ShareFile />} />
         <Route path="*" element={<NotFound />}></Route>
       </Routes>

@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import FileItem from './FileItem'; // Assuming FileItem component displays a file
+import { useState, useEffect } from 'react';
+import FileItem from './FileItem'; 
+import api from '../api';
 
 function GetSharedFiles() {
   const [sharedFiles, setSharedFiles] = useState([]);
@@ -12,7 +12,7 @@ function GetSharedFiles() {
       setIsLoading(true);
       setError(null);
       try {
-        const response = await axios.get('/api/users/shared-files/');
+        const response = await api.get('/api/files/shared/');
         setSharedFiles(response.data);
       } catch (error) {
         console.error('Error fetching shared files:', error);
@@ -23,7 +23,7 @@ function GetSharedFiles() {
     };
 
     fetchSharedFiles();
-  }, []); // Empty dependency array for initial fetch on component mount
+  }, []);
 
   return (
     <div>
@@ -34,7 +34,7 @@ function GetSharedFiles() {
         <ul>
           {sharedFiles.map((file) => (
             <li key={file.id}>
-              <FileItem file={file} />  {/* Pass the file data to FileItem component */}
+              <FileItem file={file} />
             </li>
           ))}
         </ul>

@@ -54,6 +54,7 @@ class File(models.Model):
 
 class SharedFile(models.Model):
     file = models.ForeignKey(File, on_delete=models.CASCADE)
+    filename = models.CharField(max_length=256, default="before")
     recipient = models.ForeignKey(
         CustomUser, on_delete=models.CASCADE, related_name="files_shared"
     )
