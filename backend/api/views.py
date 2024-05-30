@@ -8,13 +8,14 @@ from .serializers import CustomUserSerializer, FileSerializer
 from django.contrib.auth.models import User
 from rest_framework import generics
 from django.db.models.manager import BaseManager
+from rest_framework.parsers import MultiPartParser, FormParser
 
 
 class FileListCreate(generics.ListCreateAPIView):
     """View for adding files and listing existing files"""
 
     serializer_class = FileSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
 
     def get_queryset(self) -> BaseManager[File]:
         user = self.request.user
@@ -27,17 +28,18 @@ class FileListCreate(generics.ListCreateAPIView):
             print(serializer.errors)
 
 
-# class FileUploadView(APIView):
-#     """View for upload of files to server. Only allows authenticated users"""
+class FileUploadView(APIView):
+    """View for upload of files to server. Only allows authenticated users"""
 
-#     permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
+    parser_classes = [MultiPartParser, FormParser]
 
-#     def post(self, request):
-#         serializer = FileSerializer(data=request.data, context={"request": request})
-#         if serializer.is_valid():
-#             serializer.save()
-#             return Response(serializer.data, status=status.HTTP_201_CREATED)
-#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    def post(self, request):
+        serializer = FileSerializer(data=request.data, context={"request": request})
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"message": "File uploaded successfully."})
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class FileListView(APIView):

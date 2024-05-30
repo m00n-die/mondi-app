@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from .models import File, CustomUser
+from django.core.exceptions import ValidationError
 
 
 class CustomUserSerializer(serializers.ModelSerializer):
@@ -29,10 +30,20 @@ class CustomUserSerializer(serializers.ModelSerializer):
         return user
 
 
+def validate_file_size(value):
+    limit_in_mb = 10  # Set your desired size limit in megabytes
+    if value.size > limit_in_mb * 1024 * 1024:
+        raise ValidationError(
+            "File size must be less than or equal to {}MB".format(limit_in_mb)
+        )
+
+
 class FileSerializer(serializers.ModelSerializer):
+    file = serializers.FileField(validators=[validate_file_size])
+
     class Meta:
         model = File
-        fields = ("id", "filename", "uploaded_date", "shared_with")
+        fields = ("id", "filename", "file", "uploaded_date", "shared_with")
 
     def create(self, validated_data):
         validated_data["user"] = self.context["request"].user
