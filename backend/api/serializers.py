@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import File, CustomUser
+from .models import File, CustomUser, SharedFile
 from django.core.exceptions import ValidationError
 
 
@@ -48,3 +48,9 @@ class FileSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         validated_data["user"] = self.context["request"].user
         return super().create(validated_data)
+
+
+class SharedFileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SharedFile
+        fields = "__all__"

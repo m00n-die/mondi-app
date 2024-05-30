@@ -3,8 +3,8 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
-from .models import CustomUser, File
-from .serializers import CustomUserSerializer, FileSerializer
+from .models import CustomUser, File, SharedFile
+from .serializers import CustomUserSerializer, FileSerializer, SharedFileSerializer
 from django.contrib.auth.models import User
 from rest_framework import generics
 from django.db.models.manager import BaseManager
@@ -75,10 +75,10 @@ class ShareFileView(APIView):
                 )
             username = request.data.get("username")
             try:
-                shared_user = User.objects.get(username=username)
+                shared_user = CustomUser.objects.get(username=username)
                 file_to_share.shared_with.add(shared_user)
                 return Response({"message": "File shared successfully."})
-            except User.DoesNotExist:
+            except CustomUser.DoesNotExist:
                 return Response(
                     {"error": "User not found."}, status=status.HTTP_404_NOT_FOUND
                 )
@@ -86,6 +86,31 @@ class ShareFileView(APIView):
             return Response(
                 {"error": "File not found."}, status=status.HTTP_404_NOT_FOUND
             )
+
+
+class ShareFileView2(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, pk):
+        user = request.user
+        username = request.data["username"]
+        try:
+            recipient = CustomUser.objects.get(username=username)
+            file = File.objects.get(pk=pk, user=user)
+            shared_file = SharedFile.objects.create(file=file, recipient=recipient)
+            serializer = SharedFileSerializer(shared_file)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        except CustomUser.DoesNotExist:
+            return Response(
+                {"error": "Invalid username."}, status=status.HTTP_400_BAD_REQUEST
+            )
+        except File.DoesNotExist:
+            return Response(
+                {"error": "File not found or you do not own this file."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class DownloadFileView(APIView):
@@ -115,6 +140,16 @@ class DownloadFileView(APIView):
             return Response(
                 {"error": "File not found."}, status=status.HTTP_404_NOT_FOUND
             )
+
+
+class GetUserSharedFilesView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+        shared_files = SharedFile.objects.filter(recipient=user)
+        serialized_files = FileSerializer(shared_files, many=True)
+        return Response(serialized_files.data, status=200)
 
 
 class CreateUserView(generics.CreateAPIView):

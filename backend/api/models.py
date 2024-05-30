@@ -50,3 +50,11 @@ class File(models.Model):
     def __str__(self) -> str:
         """String representation for the FILE class"""
         return self.filename
+
+
+class SharedFile(models.Model):
+    file = models.ForeignKey(File, on_delete=models.CASCADE)
+    recipient = models.ForeignKey(
+        CustomUser, on_delete=models.CASCADE, related_name="files_shared"
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
